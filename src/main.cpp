@@ -35,7 +35,6 @@ void close_door() {
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  // initialize digital pin 13 as an output.
   Serial.begin(9600);
   pinMode(shockPin, INPUT);
   pinMode(smokePin, INPUT);
@@ -48,5 +47,12 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  
+  int fire;
+  int shock;
+  int smoke;
+  int tilt;
+  fire = analogRead(firePin);
+  shock = digitalRead(shockPin);
+  smoke = digitalRead(smokePin);
+  tilt = digitalRead(tiltPin);
 }
