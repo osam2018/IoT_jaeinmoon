@@ -1,34 +1,52 @@
 #include <Arduino.h>
-/*
-  Blink
-  Turns on an LED on for one second, then off for one second, repeatedly.
+#include <Servo.h>
 
-  Most Arduinos have an on-board LED you can control. On the Uno and
-  Leonardo, it is attached to digital pin 13. If you're unsure what
-  pin the on-board LED is connected to on your Arduino model, check
-  the documentation at http://www.arduino.cc
+int firePin = 0;
+int shockPin = 13;
+int smokePin = 12;
+int tiltPin = 11;
+int buzzerPin = 10;
+int servoPin = 9;
+int relayPin = 8;
 
-  This example code is in the public domain.
+enum {
+  tone_A=0,
+  tone_AS,
+  tone_B,
+  tone_C,
+  tone_CS,
+  tone_D,
+  tone_DS,
+  tone_E,
+  tone_F,
+  tone_FS,
+  tone_G,
+  tone_GS
+};
+Servo servo;
 
-  modified 8 May 2014
-  by Scott Fitzgerald
- */
+void open_door() {
+  servo.write(90);
+}
 
+void close_door() {
+  servo.write(0);
+}
 
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin 13 as an output.
   Serial.begin(9600);
-  pinMode(13, OUTPUT);
+  pinMode(shockPin, INPUT);
+  pinMode(smokePin, INPUT);
+  pinMode(tiltPin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(servoPin, OUTPUT);
+  pinMode(relayPin, OUTPUT);
+  servo.attach(servoPin);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  int v;
-//  digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
-//  delay(1000);              // wait for a second
-//  digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW
-  delay(100);              // wait for a second
-  v=analogRead(1);
-  Serial.println(v);
+  
 }
