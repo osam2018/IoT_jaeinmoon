@@ -1,18 +1,18 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>
+#include <IRremote.h>
 
 int firePin = 0;
-int shockPin = 13;
+int shockPin = 10;
 int smokePin = 12;
 int tiltPin = 11;
-int buzzerPins[2] = {9,10};
-int servoPin = 6;
-int relayPin = 8;
-int segmentRx = 2;
-int segmentTx = 3;
-SoftwareSerial segments =  SoftwareSerial(segmentTx, segmentRx);
-Servo servo;
+int buttonPin = 2;
+int buzzerPins[2] = {5,6};
+int segmentRx = 8;
+int segmentTx = 9;
+SoftwareSerial segments =  SoftwareSerial(segmentRx, segmentTx);
+IRsend irsend;
 
 enum {
   tone_A=0,
@@ -44,41 +44,63 @@ int DTMF[13][2]={
   {941,1477}, // frequencies for touch tone #
   {0,0} // pause
 };
-void open_door() {
-  servo.write(90);
-}
-
-void close_door() {
-  servo.write(0);
-}
 
 void playDTMF(byte digit, byte duration);
 void dialNumber(byte number[],byte len);
 
 // the setup function runs once when you press reset or power the board
 void setup() {
+  Serial.begin(9600);
   segments.begin(9600);
   pinMode(shockPin, INPUT);
   pinMode(smokePin, INPUT);
   pinMode(tiltPin, INPUT);
   pinMode(buzzerPins[0], OUTPUT);
   pinMode(buzzerPins[1], OUTPUT);
-  pinMode(servoPin, OUTPUT);
-  pinMode(relayPin, OUTPUT);
-  servo.attach(servoPin);
+  pinMode(3, OUTPUT);
+  pinMode(2, INPUT);
 }
-
 // the loop function runs over and over again forever
 void loop() {
   int fire;
   int shock;
   int smoke;
   int tilt;
+  int rst;
+  char buffer[5]={0,0,0,0,0};
+  byte numbers[11] = {1,1,9};
   fire = analogRead(firePin);
   shock = digitalRead(shockPin);
   smoke = digitalRead(smokePin);
   tilt = digitalRead(tiltPin);
-  delay(500);
+  rst = digitalRead(buttonPin);
+  if(rst==1)
+  {
+    irsend.sendSony(0xa91, 12);
+    buffer[0]='0';
+    buffer[1]='0';
+    buffer[2]='0';
+    buffer[3]='0';
+    delay(50);
+  }
+  if(fire<800 || smoke == 1 || shock == 0 || tilt == 1)
+  {
+    irsend.sendSony(0xa90, 12);
+    buffer[0] = (fire<800?1:0)+'0';
+    buffer[1] = smoke+'0';
+    buffer[2] = !shock+'0';
+    buffer[3] = tilt+'0';
+    segments.write(buffer[0]);
+    segments.write(buffer[1]);
+    segments.write(buffer[2]);
+    segments.write(buffer[3]);
+    dialNumber(numbers,3);
+    delay(50);
+  }
+  else 
+  {
+  }
+  delay(100);
 }
 
 void playDTMF(byte digit, byte duration){
@@ -111,8 +133,8 @@ void playDTMF(byte digit, byte duration){
 
 void dialNumber(byte number[],byte len){
   for(int i=0;i<len;i++){
-    playDTMF(number[i], 1000);  // 100 msec duration of tone
-    delay(1000); // 100 msec pause between tones
+    playDTMF(number[i], 200);  // 200 msec duration of tone
+    delay(100); // 100 msec pause between tones
   }
 }
 
