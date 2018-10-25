@@ -1,4 +1,5 @@
-even_seg_digits[10] = {     0b00000011,  // = 0
+#include <Arduino.h>
+int seven_seg_digits[10] = {     0b00000011,  // = 0
                                  0b10011111,  // = 1
                                  0b00100101,  // = 2
                                  0b00001101,  // = 3
@@ -9,20 +10,22 @@ even_seg_digits[10] = {     0b00000011,  // = 0
                                  0b00000001,  // = 8
                                  0b00011001   // = 9
                                  };
-
+int dataPin = 2;
+int latchPin = 3;
+int clockPin = 4;
+int segSelectPins[4] = {8,9,10,11};
 void setup() {
   // put your setup code here, to run once:
-  pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(segSelectPins[0], OUTPUT);
+  pinMode(segSelectPins[1], OUTPUT);
+  pinMode(segSelectPins[2], OUTPUT);
+  pinMode(segSelectPins[3], OUTPUT);
   Serial.begin(9600);
 }
 
-int segSelectPins[4] = {8,9,10,11};
 int segDisplay[4] = {0,0,0,0};
 int j=3;
 
@@ -40,9 +43,9 @@ void loop() {
   }
   for(int i=0;i<4;++i)
   {
-    digitalWrite(3, LOW);
-    shiftOut(2, 4, MSBFIRST, seven_seg_digits[segDisplay[i]]);
-    digitalWrite(3, HIGH);
+    digitalWrite(latchPin, LOW);
+    shiftOut(dataPin, clockPin, MSBFIRST, seven_seg_digits[segDisplay[i]]);
+    digitalWrite(latchPin, HIGH);
     digitalWrite(segSelectPins[j],LOW);
     j=(j+1)%4;
     digitalWrite(segSelectPins[j],HIGH);

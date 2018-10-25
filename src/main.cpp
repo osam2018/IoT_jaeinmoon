@@ -4,13 +4,14 @@
 #include <IRremote.h>
 
 int firePin = 0;
-int shockPin = 10;
-int smokePin = 12;
-int tiltPin = 11;
 int buttonPin = 2;
+int irPin = 3;
 int buzzerPins[2] = {5,6};
 int segmentRx = 8;
 int segmentTx = 9;
+int shockPin = 10;
+int tiltPin = 11;
+int smokePin = 12;
 SoftwareSerial segments =  SoftwareSerial(segmentRx, segmentTx);
 IRsend irsend;
 
@@ -57,8 +58,8 @@ void setup() {
   pinMode(tiltPin, INPUT);
   pinMode(buzzerPins[0], OUTPUT);
   pinMode(buzzerPins[1], OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(2, INPUT);
+  pinMode(irPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
 }
 // the loop function runs over and over again forever
 void loop() {
@@ -81,7 +82,10 @@ void loop() {
     buffer[1]='0';
     buffer[2]='0';
     buffer[3]='0';
-    delay(50);
+    segments.write(buffer[0]);
+    segments.write(buffer[1]);
+    segments.write(buffer[2]);
+    segments.write(buffer[3]);
   }
   if(fire<800 || smoke == 1 || shock == 0 || tilt == 1)
   {
@@ -95,10 +99,6 @@ void loop() {
     segments.write(buffer[2]);
     segments.write(buffer[3]);
     dialNumber(numbers,3);
-    delay(50);
-  }
-  else 
-  {
   }
   delay(100);
 }
